@@ -2,9 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import io, { Socket } from 'socket.io-client'
-import Header from './Header'
-import ChatBox from './ChatBox'
-import ControlPanel from './ControlPanel'
+import OnlineStats from './OnlineStats'
 
 interface Message {
     text: string
@@ -23,9 +21,22 @@ export default function ChatInterface({ onBackToHome }: ChatInterfaceProps) {
     const [isSearching, setIsSearching] = useState(false)
     const [messages, setMessages] = useState<Message[]>([])
     const [strangerCountry, setStrangerCountry] = useState<string>('')
-    const [connectionStatus, setConnectionStatus] = useState<string>('Click "New" to start chatting')
+    const [connectionStatus, setConnectionStatus] = useState<string>('Click "Skip" to start chatting')
+    const [message, setMessage] = useState('')
+    const [showRules, setShowRules] = useState(true)
+    const messagesEndRef = useRef<HTMLDivElement>(null)
+
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }
 
     useEffect(() => {
+        scrollToBottom()
+    }, [messages])
+
+    useEffect(() => {
+        if (showRules) return // Don't connect until rules are accepted
+
         const newSocket = io({
             path: '/socket.io',
             transports: ['websocket', 'polling'],
@@ -36,8 +47,6 @@ export default function ChatInterface({ onBackToHome }: ChatInterfaceProps) {
 
         newSocket.on('connect', () => {
             console.log('Connected to server with ID:', newSocket.id)
-            // Auto-start searching when entering chat
-            console.log('Emitting find-stranger event')
             newSocket.emit('find-stranger')
             setIsSearching(true)
             setConnectionStatus('Looking for someone you can chat with...')
@@ -86,7 +95,7 @@ export default function ChatInterface({ onBackToHome }: ChatInterfaceProps) {
             console.log('Closing socket connection')
             newSocket.close()
         }
-    }, [])
+    }, [showRules])
 
     const handleNewChat = () => {
         if (socket) {
@@ -107,59 +116,125 @@ export default function ChatInterface({ onBackToHome }: ChatInterfaceProps) {
         }
     }
 
-    const handleSendMessage = (message: string, image?: string) => {
-        if (socket && isConnected && (message.trim() || image)) {
-            const messageData = image ? { text: message, image } : message
-            socket.emit('message', messageData)
+    const handleSendMessage = () => {
+        if (socket && isConnected && message.trim()) {
+            socket.emit('message', message)
             setMessages(prev => [...prev, {
                 text: message,
                 sender: 'you',
                 timestamp: Date.now(),
-                image
             }])
+            setMessage('')
         }
     }
 
+    const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault()
+            handleSendMessage()
+        }
+    }
+
+    const handleAgreeRules = () => {
+        setShowRules(false)
+    }
+
     return (
-        <div className="flex flex-col h-screen">
-            <Header />
-
-            <div className="flex-1 container mx-auto px-4 py-6 max-w-5xl">
-                <div className="bg-white rounded-lg shadow-xl overflow-hidden">
-                    <div className="bg-omegle-blue text-black px-6 py-3">
-                        <p className="text-sm font-medium">{connectionStatus}</p>
+        <div className="flex flex-col h-screen bg-white">
+            {/* Header */}
+            <header className="bg-white border-b border-gray-300 px-4 py-3 flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                    <svg className="w-10 h-10" viewBox="0 0 48 48" fill="none">
+                        <circle cx="24" cy="24" r="22" fill="#0099ff" fillOpacity="0.2" />
+                        <text x="24" y="32" fontSize="24" fill="#0099ff" fontWeight="bold" textAnchor="middle">O</text>
+                    </svg>
+                    <div>
+                        <h1 className="text-2xl font-bold" style={{ color: '#ff6600' }}>omegle</h1>
+                        <p className="text-sm text-gray-600">Talk to strangers!</p>
                     </div>
+                </div>
+                <OnlineStats />
+            </header>
 
-                    <ChatBox messages={messages} isConnected={isConnected} />
-
-                    <ControlPanel
-                        isConnected={isConnected}
-                        isSearching={isSearching}
-                        onNewChat={handleNewChat}
-                        onStopChat={handleStopChat}
-                        onSendMessage={handleSendMessage}
-                    />
-
-                    {onBackToHome && (
-                        <div className="px-4 pb-4 border-t border-gray-200 pt-4">
+            {/* Rules Modal */}
+            {showRules && (
+                <div className="absolute inset-0 bg-white z-50 flex items-start justify-center pt-20 px-4">
+                    <div className="bg-white max-w-2xl w-full">
+                        <div className="mb-6">
+                            <p className="text-blue-500 text-sm mb-4">
+                                <span className="font-bold">omegleweb.io</span>: Talk to strangers!
+                            </p>
+                            <h2 className="text-xl font-bold mb-4">Welcome to OmegleWeb.io, please read the rules below:</h2>
+                            <p className="text-red-600 font-bold mb-3">You must be at least 18 years old</p>
+                            <ul className="space-y-2 text-gray-700 mb-6">
+                                <li>No nudity, hate speech, or harassment</li>
+                                <li>Do not ask for gender. This is not a dating site</li>
+                                <li>Respect others and be kind</li>
+                                <li>Violators will be banned</li>
+                            </ul>
                             <button
-                                onClick={onBackToHome}
-                                className="w-full px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition font-medium"
+                                onClick={handleAgreeRules}
+                                className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded"
                             >
-                                ← Back to Home
+                                I Agree
                             </button>
                         </div>
-                    )}
+                    </div>
                 </div>
+            )}
 
-                <div className="mt-6 text-center text-sm text-gray-600">
-                    <p className="mb-2">
-                        <strong>Omegle</strong> lets you talk to strangers instantly. Just click &quot;New&quot; to start a chat!
-                    </p>
-                    <p className="text-xs text-gray-500">
-                        ⚠️ Please be respectful and follow community guidelines.
-                    </p>
-                </div>
+            {/* Chat Status */}
+            <div className="bg-gray-100 px-4 py-2 text-sm text-gray-700 border-b border-gray-300">
+                {connectionStatus}
+            </div>
+
+            {/* Messages Area */}
+            <div className="flex-1 overflow-y-auto p-4 bg-white">
+                {messages.length === 0 && !isSearching && (
+                    <div className="flex items-center justify-center h-full text-gray-400">
+                        <p>Start chatting by clicking Skip to find a stranger!</p>
+                    </div>
+                )}
+
+                {messages.map((msg, index) => (
+                    <div key={index} className="mb-2">
+                        <span className="font-bold text-sm" style={{ color: msg.sender === 'you' ? '#0000FF' : '#FF0000' }}>
+                            {msg.sender === 'you' ? 'You' : 'Stranger'}:
+                        </span>
+                        <span className="ml-2 text-sm text-black">{msg.text}</span>
+                    </div>
+                ))}
+                <div ref={messagesEndRef} />
+            </div>
+
+            {/* Control Panel */}
+            <div className="border-t border-gray-300 bg-white p-2 flex items-center space-x-2">
+                <button
+                    onClick={handleNewChat}
+                    className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-8 rounded text-lg min-w-[120px]"
+                >
+                    Skip
+                    <div className="text-xs font-normal">Esc</div>
+                </button>
+
+                <input
+                    type="text"
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    placeholder="Type a message..."
+                    disabled={!isConnected}
+                    className="flex-1 px-4 py-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 text-black"
+                />
+
+                <button
+                    onClick={handleSendMessage}
+                    disabled={!isConnected || !message.trim()}
+                    className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-8 rounded disabled:bg-gray-300 disabled:cursor-not-allowed text-lg min-w-[120px]"
+                >
+                    Send
+                    <div className="text-xs font-normal">Enter</div>
+                </button>
             </div>
         </div>
     )
