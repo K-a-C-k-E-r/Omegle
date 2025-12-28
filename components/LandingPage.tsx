@@ -42,15 +42,15 @@ export default function LandingPage({ onStartChat }: LandingPageProps) {
                     <h2 className="text-2xl font-bold mb-4">The Safety Thing (For Real Though)</h2>
 
                     <p className="text-gray-700 mb-4">
-                        We're not gonna lie - the original Omegle had... issues. That's why we built this with AI monitoring,
+                        We&apos;re not gonna lie - the original Omegle had... issues. That&apos;s why we built this with AI monitoring,
                         human mods watching streams, fake webcam detection, and instant reporting. Still anonymous and spontaneous,
-                        just way less Wild West energy. Our community guidelines aren't just there for show - we actually enforce them.
+                        just way less Wild West energy. Our community guidelines aren&apos;t just there for show - we actually enforce them.
                     </p>
 
                     <p className="text-gray-700 mb-4">
                         Thousands of people use OmegleWeb daily to meet strangers without the sketch factor. No registration,
                         no app download, just instant connections with way better safety. Ready to actually{' '}
-                        <strong>talk to strangers</strong> without worrying about weirdos? Let's go.
+                        <strong>talk to strangers</strong> without worrying about weirdos? Let&apos;s go.
                     </p>
 
                     <p className="text-sm text-gray-600 mb-2">
@@ -157,7 +157,7 @@ export default function LandingPage({ onStartChat }: LandingPageProps) {
                         <div>
                             <h3 className="font-semibold text-lg mb-2">Wait, is this actually free?</h3>
                             <p className="text-gray-700">
-                                Yup. 100% free! No credit card, no subscription BS, no "free trial" that charges you later.
+                                Yup. 100% free! No credit card, no subscription BS, no &quot;free trial&quot; that charges you later.
                                 Just pure random chat vibes whenever you want.
                             </p>
                         </div>
@@ -165,8 +165,8 @@ export default function LandingPage({ onStartChat }: LandingPageProps) {
                         <div>
                             <h3 className="font-semibold text-lg mb-2">How does the matching work?</h3>
                             <p className="text-gray-700">
-                                We randomly pair you with another person who's online. If you added interests, we'll try to
-                                match you with someone who shares similar interests. Otherwise, it's completely random!
+                                We randomly pair you with another person who&apos;s online. If you added interests, we&apos;ll try to
+                                match you with someone who shares similar interests. Otherwise, it&apos;s completely random!
                             </p>
                         </div>
 
@@ -182,15 +182,15 @@ export default function LandingPage({ onStartChat }: LandingPageProps) {
                         <div>
                             <h3 className="font-semibold text-lg mb-2">Can I choose who I talk to?</h3>
                             <p className="text-gray-700">
-                                Nope! That's the whole point - random conversations with strangers. But you can skip to the
-                                next person anytime by clicking "New" if the conversation isn't your vibe.
+                                Nope! That&apos;s the whole point - random conversations with strangers. But you can skip to the
+                                next person anytime by clicking &quot;New&quot; if the conversation isn&apos;t your vibe.
                             </p>
                         </div>
 
                         <div>
                             <h3 className="font-semibold text-lg mb-2">Do I need to register?</h3>
                             <p className="text-gray-700">
-                                No registration required! Just click "Text" and you're good to go. We keep it simple and anonymous.
+                                No registration required! Just click &quot;Text&quot; and you&apos;re good to go. We keep it simple and anonymous.
                             </p>
                         </div>
                     </div>

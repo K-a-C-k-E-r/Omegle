@@ -144,7 +144,7 @@ export default function ChatInterface({ onBackToHome }: ChatInterfaceProps) {
 
                 <div className="mt-6 text-center text-sm text-gray-600">
                     <p className="mb-2">
-                        <strong>Omegle</strong> lets you talk to strangers instantly. Just click "New" to start a chat!
+                        <strong>Omegle</strong> lets you talk to strangers instantly. Just click &quot;New&quot; to start a chat!
                     </p>
                     <p className="text-xs text-gray-500">
                         ⚠️ Please be respectful and follow community guidelines.
